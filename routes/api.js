@@ -21,7 +21,31 @@ module.exports = function (app, db) {
   // So the google-finance api (shown in user stories) is not working, so we will replace it with something else..
   app.route('/api/stock-prices')
     .get(function (req, res){
-      let stock = req.query.stock;
+      let stock = req.query.stock.toUpperCase();
+      let like = req.query.like;
+      db.collection('stocks').findOneAndUpdate(
+        { stock: stock }, 
+        { $inc: { likes: (like ? 1 : 0) } },  
+        { upsert: true,
+          new: true,
+          returnOriginal: false,
+        }, 
+        function(error, result) {
+          if (error) res.json({ message: "Database Error" })
+          else {
+            // fake response for now so we dont use API
+            // US 3: In stockData, I can see the stock(string, the ticker), price(decimal in string format), and likes(int).
+            res.json({
+              stockData: {
+                stock: result.value.stock,
+                price: "100.17",
+                likes: result.value.likes
+              }
+            });
+          }
+      });
+
+
       // fetch('https://finance.google.com/finance/info?q=NASDAQ%3a'+stock)
       // .then(function(response) {
       //   console.log(response);
@@ -41,15 +65,5 @@ module.exports = function (app, db) {
       //     }})
       //   });
       // });
-
-      // fake response for now so we dont use API
-      res.json({
-        stockData: {
-          stock: stock.toUpperCase(),
-          price: 100,
-        }
-      })
     });
-
-    
 };
