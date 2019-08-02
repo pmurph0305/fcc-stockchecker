@@ -22,20 +22,48 @@ suite('Functional Tests', function() {
         .get('/api/stock-prices')
         .query({stock: 'goog'})
         .end(function(err, res){
-          
-          //complete this one too
-          
+          assert.equal(res.status, 200);
+          assert.equal(res.body.stockData.stock, "GOOG");
+          assert.isString(res.body.stockData.stock);
+          assert.isString(res.body.stockData.price);
+          assert.isNumber(Number(res.body.stockData.price));
+          assert.isNumber(res.body.stockData.likes);
           done();
         });
       });
       
-      // test('1 stock with like', function(done) {
-        
-      // });
+      var fakeStock = Math.random().toString();
+      test('1 stock with like', function(done) {
+        chai.request(server)
+        .get('/api/stock-prices')
+        .query({ stock: fakeStock, like: true })
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.stockData.stock, fakeStock);
+          assert.isString(res.body.stockData.stock);
+          assert.isString(res.body.stockData.price);
+          assert.isNumber(Number(res.body.stockData.price));
+          assert.isNumber(res.body.stockData.likes);
+          assert.equal(res.body.stockData.likes, 1);
+          done();
+        })
+      });
       
-      // test('1 stock with like again (ensure likes arent double counted)', function(done) {
-        
-      // });
+      test('1 stock with like again (ensure likes arent double counted)', function(done) {
+        chai.request(server)
+        .get('/api/stock-prices')
+        .query({ stock: fakeStock, like: true })
+        .end(function(err, res) {
+          assert.equal(res.status, 200);
+          assert.equal(res.body.stockData.stock, fakeStock);
+          assert.isString(res.body.stockData.stock);
+          assert.isString(res.body.stockData.price);
+          assert.isNumber(Number(res.body.stockData.price));
+          assert.isNumber(res.body.stockData.likes);
+          assert.equal(res.body.stockData.likes, 1);
+          done();
+        })
+      });
       
       // test('2 stocks', function(done) {
         
