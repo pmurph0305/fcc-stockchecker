@@ -20,11 +20,13 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 //US 1: Set the content security policies to only allow loading of scripts and css from your server.
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-    defaultSrc: ["'self'"]
-  }
-}));
+// app.use(helmet.contentSecurityPolicy({
+//   directives: {
+//     defaultSrc: ["'self'"],
+//     styleSrc: ["'self'"],
+//     scriptSrc: ["'self'"]
+//   }
+// }));
 
 //Index page (static HTML)
 app.route('/')
