@@ -7,7 +7,8 @@
 */
 
 'use strict';
-
+require('dotenv').config();
+const fetch = require('node-fetch');
 var expect = require('chai').expect;
 var MongoClient = require('mongodb');
 
@@ -71,34 +72,24 @@ module.exports = function (app, db) {
       let count = 0;
       let stockData = [];
       stocks.forEach(stock => {
-        https.get('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol='+stock+"&apikey="+process.env.AV_API_KEY, function(response) {
-          let data = ''
-          response.on('data', (chunk) => {
-            data += chunk;
-          });
-          response.on('end', () => {
-            let d = JSON.parse(data);
-            if (d.Note) {
-              reject("Too many api calls!");
-            }
-            if (d['Global Quote']) {
-              if (d['Global Quote']['01. symbol'] && d['Global Quote']['05. price']) {
-                stockData.push({
-                  stock: d['Global Quote']['01. symbol'],
-                  price: d['Global Quote']['05. price']
-                });
-              } else {
-                stockData.push({ stock: stock, price: '1234567' });
-              }
-              count+=1;
-              if (count == stocks.length) {
-                resolve(stockData);
-              }
-            }
-          });
-          response.on('error', () => {
-            reject('Error getting price data');
-          });
+        fetch("https://"+process.env.RAPID_API_HOST+"/stock/"+stock+"/ohlc", {
+          headers: {
+            "x-rapidapi-host": process.env.RAPID_API_HOST,
+            "x-rapidapi-key": process.env.RAPID_API_KEY
+          }
+        }).then(response => response.json())
+        .then(result => {
+          stockData.push({
+            stock: stock,
+            price: result.open.price.toString(),
+          })
+          count +=1; 
+          if (count == stocks.length) {
+            resolve(stockData);
+          }
+        })
+        .catch(err => {
+          reject("Error getting price data.");
         });
       });
     })

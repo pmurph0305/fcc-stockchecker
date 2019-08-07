@@ -33,7 +33,7 @@ suite('Functional Tests', function() {
           });
       });
       
-      var fakeStock = Math.random().toString();
+      var fakeStock = 'GOOG'
       test('1 stock with like', function(done) {
         this.timeout(4000);
         chai.request(server)
@@ -72,7 +72,7 @@ suite('Functional Tests', function() {
         this.timeout(4000);
         chai.request(server)
         .get('/api/stock-prices')
-        .query({ stock: ['goog','msft'] })
+        .query({ stock: ['GOOG','MSFT'] })
         .end(function(err, res) {
           console.log(res.body.stockData);
           assert.equal(res.status, 200);
@@ -93,11 +93,8 @@ suite('Functional Tests', function() {
 
       test('2 stocks with like', function(done) {
           this.timeout(4000);
-          let fakestock1 = Math.random().toString();
-          let fakestock2 = Math.random().toString();
-          while (fakestock2 === fakestock1) {
-            fakestock2 = Math.random().toString();
-          }
+          let fakestock1 = 'GOOG'
+          let fakestock2 = 'MSFT'
           chai.request(server)
           .get('/api/stock-prices')
           .query({ stock: [fakestock1, fakestock2], like: true })
